@@ -1,0 +1,64 @@
+<!--copyright @ Eko India Financial Service Pvt. Ltd.-->
+{% extends "base_agent.html" %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block heading %}
+	{{ user.first_name|default:user.username | title }} {{ user.last_name|title }}
+{% endblock %}
+
+{% block my_content %}
+    
+    
+    <div class="row">	
+		<div class="push_one pull_left four columns">
+			<h4>Profile</h4>
+			<div class="default"><span style="color:#2980b9;">User Name</span> : {{ user.username|title }}</div>
+			<div class="default"><span style="color:#2980b9;">Name</span> : {{ user.first_name|default:user.username|title }} {{ user.last_name|title }}</div>
+			<div class="default"><span style="color:#2980b9;">Mobile Number</span> : {{ mobile_number }}</div>
+			<div class="default"><span style="color:#2980b9;">Code</span> : {{ code }}</div>
+			<br/>
+			<div class="medium secondary metro rounded btn"><a href="{% url 'user:password_change'%}">Change Password</a></div>			
+		</div>	
+		
+		<div class="push_two four columns">
+			<div class="twelve columns"><h4 class="pull_right">Settings</h4></div>
+			<br/>
+			<div class="twelve columns"><div class="default pull_right"><span style="color:#2980b9;" id="booklet_label"> Fetching booklet info ... </span><span id="booklet_num"></span></div></div>
+			<div class="twelve columns"/>
+			<br/>
+			<div class="medium secondary metro rounded btn pull_right"><a href="{% url 'transaction:booklet-registration'%}">Register Booklet</a></div>		
+		</div>		    
+    </div>
+    
+    <br/>
+    
+    <div class="row">
+	<div class="twelve columns">
+		<div>
+			
+		</div>		
+    </div>
+    </div>
+{% endblock my_content %}
+
+{% block my_script %}
+<script>
+window.onload=function(){
+	$('#accountusermenu').addClass('active');
+	
+	Dajaxice.transaction.booklet_inquiry(bookletInquiry_response, {});
+};
+
+function bookletInquiry_response(data) {
+	if(data.status == "BOOKLET_INQUIRY_SUCCESS") {
+		$("#booklet_label").text("Current Booklet");
+		$("#booklet_num").text(" : " + data.booklet_number);
+	}
+	else {
+		$("#booklet_label").text("Error getting info");
+		$("#booklet_num").text("");
+	}
+};
+</script>
+{% endblock my_script %}

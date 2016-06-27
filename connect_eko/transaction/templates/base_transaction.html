@@ -1,0 +1,217 @@
+<!--copyright @ Eko India Financial Service Pvt. Ltd.-->
+{% extends "base_agent.html" %}
+{% load staticfiles %}
+
+{% block head %}
+{{block.super}}
+	<link rel="stylesheet" href="{% static 'css/pageguide.min.css' %}">
+	<style>
+	#OVER { width:100%; height:100%; left:0;/*IE*/ top:0; text-align:center; z-index:10; position:fixed;
+        <!-- background-color:#F4F4F4; -->}
+.overlay { width:100%; height:100%; z-index:5000; left:0;/*IE*/ top:0; <!-- font-color:#cdcdcd; font-size:0.8em; -->
+            text-align:center; position:fixed;
+    		background: url({% static 'img/loader.gif' %}) no-repeat fixed center center;
+    		background-color: #EFEFEF;
+    		opacity:0.7;
+    		
+		 }
+
+	</style>
+{% endblock head %}
+{% block title %}
+Money Transfer
+{% endblock %}
+
+{% block transaction_status_heading %}
+<div class="row" style="margin-bottom:10px;">
+	<div class="twelve columns" id="status_label">
+		<div class="default alert pull_left" id="balance_label">
+			<span id="balance" style="color:#2980b9; font-size: 13px;  padding-right: 4px;">Getting info ...</span>
+			<span id="signature" style="color:#c0392b; font-size: 13px;"></span>
+		</div>
+		<div class="medium metro rounded btn pull_left" onclick="balanceInquiry()" style="margin-left:5px;" title="Refresh">
+			<i id="refresh_label" class="icon-ccw" href=""></i>
+		</div>
+		<div class="pull_left" id="timestamp_label" style="margin-left: 10px;">
+			<span id="timestamp" style="font-style: italic; font-size: 13px; display: none; color: #bdc4c7;"></span>
+		</div>
+			
+		<div class="prepend append field inputbox  four columns" style="margin-bottom:4px; padding-top:0px;float:right" id="tid_search">
+		<span class="adjoined"><i class="icon-book-open"></i></span>
+		<input class="xwide text input" type="text" placeholder="TID Search" id="tid_search_field" maxlength="9" name="tid_search_field" autocomplete="off" onkeypress="return isNumber(event)" />
+	    <div class="medium metro rounded btn " onclick="transaction_search_by_tid()" style="margin-left:5px;" title="Search">
+			<i id="refresh_label_1" class="icon-search" href=""></i>
+		</div>
+	    </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block heading %}
+	Send Money
+{% endblock heading %}
+
+{% block my_content %}
+<div class="row">
+		<div class="loading overlay textcenter"></div>
+</div>
+
+
+
+
+
+
+{% endblock my_content %}
+
+{% block my_script %}
+	<script type="text/javascript">
+
+		window.onload=function(){
+			$("#transactmenu").addClass("active");
+			$('.loading').show();
+
+			balanceInquiry();
+		};
+
+		var bookletSize = null;
+		var usedCount = null;
+
+		function balanceInquiry() {
+			$("#refresh_label").addClass("spin");
+			Dajaxice.transaction.balance_inquiry(balanceInquiry_response, {});
+		}
+
+		function balanceInquiry_response(data) {
+			$("#refresh_label").removeClass("spin");
+			$('.loading').hide();
+
+			$("#bank").text(data.bank);
+			if(data.status == "SUCCESS") {
+				console.log(data)
+				var array = data.balance.split(".");
+				console.log(array);
+				
+				$("#balance").text("Balance: \u20b9 " + (addDecoration(array[0]) + "." + array[1]) + " ");
+				$("#signature").text("Last OkeKey: " + data.signature);
+				$("#timestamp").show();
+				$("#timestamp").text("As of " + data.timestamp);
+				usedCount = data.signature;
+				Dajaxice.transaction.booklet_inquiry(bookletInquiry_response, {});
+
+				$('#three_boxes').removeClass('boxes_hidden');
+			}
+			else if (data.status == "AGREEMENT_PENDING")
+			{
+				$("#modal1").addClass('active');
+				$("#modal1content").attr('tabindex',-1).focus();
+
+				$('#three_boxes').addClass('boxes_hidden');
+			}
+			else {
+				$("#balance").text("Error getting info... ");
+				$("#signature").text("");
+				$("#timestamp").hide();
+
+				$('#three_boxes').removeClass('boxes_hidden');
+			}
+		}
+
+		function addDecoration(input) {
+			var output = "";
+			var len = input.length;
+			console.log("legth="+len)
+
+			
+			return input;
+		}
+
+		function bookletInquiry_response(data) {
+			if(data.status == "BOOKLET_INQUIRY_SUCCESS") {
+				bookletSize = data.signature_count;
+				checkAndShowRegisterBookletPrompt();
+				//alert("booklet size set" + data.signature_count);
+			}
+		}
+
+		function checkAndShowRegisterBookletPrompt() {
+			if(bookletSize != null && usedCount != null && usedCount > (bookletSize - 5))
+				$("#register_booklet_label").show();
+			else
+				$("#register_booklet_label").hide();
+		}
+
+		function setUsedCount(count) {
+			usedCount = count;
+		}
+
+		/* added by Saurabh on 24 Apr 2015:PPI changes */
+		function post_agreement_consent() {
+			if ($('#check_agree').is(':checked'))
+			{
+				Dajaxice.transaction.post_agreement_consent(post_agreement_consent_response, {});
+			}
+		}
+
+		/* Added 2 May 2015 by Kr. Abhishek for PPI */
+		function i_agree_changed()
+		{
+			if ($('#check_agree').is(':checked'))
+			{
+				// Agreed...Enable Ok button
+				$('#btn_aggrement_ok').removeClass('btn_disabled');
+				//$('#btn_aggrement_ok').attr("gumby-trigger", "|#modal1");
+			}
+			else
+			{
+				// Not Agreed...Disable Ok button
+				$('#btn_aggrement_ok').addClass('btn_disabled');
+				//$('#btn_aggrement_ok').removeAttr("gumby-trigger");
+			}
+		}
+
+		function post_agreement_consent_response(data) {
+
+			if (data.status == "SUCCESS")
+			{
+				$("#modal1").removeClass('active');
+				balanceInquiry();
+				$('.loading').show();
+			}
+			else
+			{
+				$("#modal1").addClass('active');
+
+				$('.loading').hide();
+				$('#three_boxes').addClass('boxes_hidden');
+			}
+		}
+		
+		/*added by rohit lakshykar start*/
+		function transaction_search_by_tid() {
+			console.log("inside tid search 1");
+			if($("#tid_search_field").val() == ''){
+				$("#tid_search_field").focus();
+				return false;
+			}
+			var tid=$("#tid_search_field").val();
+			console.log("inside tid search 2");
+			//$("#refresh_label_1").addClass("spin");
+			Dajaxice.transaction.transaction_search_by_tid(transaction_search_by_tid_response, {
+					'transactionId': tid,
+			});
+		}
+		
+		function transaction_search_by_tid_response(data) {
+			//$("#refresh_label_1").removeClass("spin");
+			addMessageData(data);
+		}
+		
+		function addMessageData(data){
+			$("#trxn_response").prepend("<div class='current_msg row'><div id='status_mssg' class='mssgbox'><p class='medium'>" + data.responseText + "</p></div></div>");
+			$('#trxn_response').show("slow");
+		};
+		//added by rohit lakshykar end
+		
+	</script>
+	
+{% endblock my_script %}

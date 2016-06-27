@@ -1,0 +1,12 @@
+<!--copyright @ Eko India Financial Service Pvt. Ltd.-->
+    <div class="row">
+	<div class="twelve columns">
+		<h3 class="textcenter"> {{ user.first_name|title }} {{ user.last_name|title }} </h3>
+		<div>{{user.email}} <span class="pull_right">{{user.username}}</span></div>
+		<div>Joined {{user.date_joined|naturaltime}}<span class="pull_right"> <div class="small default btn icon-left entypo icon-lock">
+			<a href="{% url 'user:password_change'%}">Change Password</a>
+		</div>
+		</span>
+		</div>
+    </div>
+    </div>

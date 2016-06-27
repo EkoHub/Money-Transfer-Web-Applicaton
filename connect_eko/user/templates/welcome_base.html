@@ -1,0 +1,88 @@
+<!--copyright @ Eko India Financial Service Pvt. Ltd.-->
+{% load staticfiles %}
+{% load i18n %}
+<!doctype html>
+ <html class="no-js" lang="en" itemscope itemtype="http://schema.org/Product"> <!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Connect - A Distribution Management Tool of Eko</title>
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
+  <meta name="author" content="humans.txt">
+
+  <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+
+  <!-- Facebook Metadata /-->
+  <meta property="fb:page_id" content="" />
+  <meta property="og:image" content="" />
+  <meta property="og:description" content=""/>
+  <meta property="og:title" content=""/>
+
+  <!-- Google+ Metadata /-->
+  <meta itemprop="name" content="">
+  <meta itemprop="description" content="">
+  <meta itemprop="image" content="">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <!-- We highly recommend you use SASS and write your custom styles in sass/_custom.scss.
+       However, there is a blank style.css in the css directory should you prefer -->
+  <link rel="stylesheet" href="{% static 'css/gumby.css' %}">
+  <link rel="stylesheet" type="text/css" href="http://cdn.webrupee.com/font">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script src="{% static 'js/libs/modernizr-2.6.2.min.js' %}"></script>
+</head>
+
+<body>
+  <div class="navcontain">
+  <div class="navbar" gumby-fixed="top">
+       <nav class="row">
+	<a class="toggle" gumby-trigger="#menu" href="#"><i class="icon-menu"></i></a>
+      <div class="two columns logo" style="margin-right: -16px;;padding: 6px 0;">
+					<a href="#" title="Dashboard">  <img src="{% static 'img/Connect_Logo.png' %}" style="height:28px;" gumby-retina alt="Home"/>
+					</a>
+		</div>
+		<nav class="three columns" style="right:-30px;text-align:right;">
+		<ul>
+         <li>
+				<a href="http://www.eko.co.in">About Eko</a>
+        </li>
+        <li><a href="https://59.162.111.217:8080/edicsbi/">EDIC-SBI</a></li>
+        <li><a href="https://59.162.111.217:8080/edicicici/">EDIC-ICICI</a></li>
+        <li><a href="https://59.162.104.73:7070/edicyes">EDIC-YES</a></li>
+        <!-- <li><a style="color:#09CFF4;font-family:Sans-serif;" href="http://www.eko.co.in"></a></li> -->
+		 </ul>
+		 </nav>
+		</nav>
+    </div>
+    </div>
+
+      <div class="row pagetitlerow">
+        <h5 class="eight columns left-center">Connect to your <a href="http://www.eko.co.in/product/">Eko</a> products and manage your channel</h5>
+		<div class="four columns pull_right textright">
+		Helpline : 1860 500 66 77 <i class="icon-phone"></i>	
+		</div>
+      </div>
+
+<div class="row"><div id="content">{% block content %}{% endblock %}</div></div>
+
+    <div id="footer">{% block footer %}{% endblock %}</div>
+
+  <!-- Change UA-XXXXX-X to be your site's ID -->
+  <script>
+    window._gaq = [['_setAccount','EKO'],['_trackPageview'],['_trackPageLoadTime']];
+    Modernizr.load({
+      load: ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js'
+    });
+  </script>
+
+  <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.
+       chromium.org/developers/how-tos/chrome-frame-getting-started -->
+  <!--[if lt IE 7 ]>
+    <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->
+  </body>
+</html>

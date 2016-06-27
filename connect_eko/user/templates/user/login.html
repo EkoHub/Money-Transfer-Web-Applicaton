@@ -1,0 +1,64 @@
+<!--copyright @ Eko India Financial Service Pvt. Ltd.-->
+{% extends "base_user.html" %}
+{% load staticfiles %}
+
+{% block body_background_image %}
+{% endblock %}
+{% block my_content %}
+
+<div class="row">
+	<div class="textcenter">
+
+		<br/><br/>
+		<div class="row">
+			
+			<div >
+				<br/><br/>
+				{% if messages %}
+				<ul class="messages">
+				    {% for message in messages %}
+				    <li{% if message.tags %} class="{{ message.tags }} alert"{% endif %} style="text-align:center">{{ message }}</li>
+				    {% endfor %}
+				</ul>
+				{% endif %}
+			    <form method="post" action="{% url 'user:user-login' %}">
+					{% if next %}
+			        <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+			        {% endif %}
+			        <ul class="ten columns centered textcenter">
+						<li class="field">
+							<input style="width: 254px; height: 40px; background-image: url('{% static 'icons/icon_user.png' %}'); background-position: right; background-repeat:no-repeat; padding-right: 40px;" class="xwide text input" name="username" type="text" placeholder="Mobile Number" autocomplete="off" autofocus/>
+						</li>
+						<li class="field">
+							<input style="width: 254px; height: 40px; background-image: url('{% static 'icons/icon_password.png' %}'); background-position: right; background-repeat:no-repeat; padding-right: 40px;" class="xwide password input" name="password" type="password" placeholder="Password" autocomplete="off"/>
+						</li>
+						<li>
+							<div class="large metro rounded btn primary">
+								<input style="width: 252px; height: 38px; font-family: 'aller_rg-webfont'; font-size: 17px;" type="submit" value="Sign In"/>
+							</div>
+						</li>
+				    </ul>
+			   	</form>
+			</div>
+		</div>
+	</div>
+</div>		
+	
+{% endblock my_content %}
+
+{% block my_script %}
+	<script type='text/javascript' src="{% static 'js/knockout-3.0.0.js' %}"></script>
+	<script type='text/javascript' id="viewModelTemplate">
+		
+
+		
+		function isNumber(evt) {
+	        var charCode = (evt.which) ? evt.which : event.keyCode;
+	        if (charCode > 31 && (charCode < 48 || charCode > 57))
+	           return false;
+	        return true;
+	    }
+	</script>
+	
+
+{% endblock %}

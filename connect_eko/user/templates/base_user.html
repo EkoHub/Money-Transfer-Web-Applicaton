@@ -1,0 +1,87 @@
+<!--copyright @ Eko India Financial Service Pvt. Ltd.-->
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load i18n %}
+{% load dajaxice_templatetags %}
+
+
+{% block head %}
+	<!-- We highly recommend you use SASS and write your custom styles in sass/_custom.scss.
+			 However, there is a blank style.css in the css directory should you prefer -->
+	<link rel="stylesheet" href="{% static 'css/gumby.css' %}">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+	<!-- <link rel="stylesheet" href="{% static 'css/screen.css' %}"> -->
+	{% dajaxice_js_import %}
+	<script src="{% static 'dajax/jquery.dajax.core.js' %}"></script>
+	<script src="{% static 'js/libs/modernizr-2.6.2.min.js' %}"></script>
+{% endblock head %}
+
+{% block header %}
+	<div class="navcontain">
+		<div class="navbar" gumby-fixed="top" id="nav1">
+			<div class="row">
+				<a class="toggle" gumby-trigger="#nav1 > .row > ul" href="#"><i class="icon-menu"></i></a>
+				<div class="two columns logo" style="margin-right: -16px;;padding: 6px 0;">
+					<a href="#" title="Dashboard">  <img src="{% static 'img/Connect_Logo_Text.png' %}" style="height:28px;" gumby-retina alt="Home"/>
+					</a>
+				</div>
+				{% block navigation %}
+			<div class="six columns" id="mainmenu">
+			<ul>
+				<li><a href="http://www.eko.co.in" target="_blank" style="font-size: 15px;">ABOUT EKO</a></li>
+				
+			</ul>
+			</div>
+			{% endblock %}
+			</div>
+		</div>
+	</div>
+
+<div class="row">
+		<div class="twelve columns centered" style="margin-bottom:6px;">
+<h3 class="textcenter"> {% block heading %}{% endblock %}</h3>
+</div>
+</div>
+{% endblock header %}
+
+{% block content %}
+	<div id="content">{% block my_content %} {% endblock my_content %}</div>
+{% endblock %}
+
+{% block script %} 
+	<script>
+		
+	var oldieCheck = Boolean(document.getElementsByTagName('html')[0].className.match(/\soldie\s/g));
+	if(!oldieCheck) {
+	document.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"><\/script>');
+	} else {
+	document.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"><\/script>');
+	}
+	</script>
+	
+	<script>
+	if(!window.jQuery) {
+	var oldieCheck = Boolean(document.getElementsByTagName('html')[0].className.match(/\soldie\s/g));
+	if(!oldieCheck) {
+	  document.write('<script src="{% static "js/libs/jquery-2.0.2.min.js" %}"><\/script>');
+	} else {
+	  document.write('<script src="{% static "js/libs/jquery-1.10.1.min.js" %}"><\/script>');
+	}
+	}
+	</script>
+	<script src="{% static 'js/libs/gumby.min.js' %}"></script>
+	<script src="{% static 'js/plugins.js' %}"></script>
+	<script src="{% static 'js/main.js' %}"></script>
+  <!-- Change UA-XXXXX-X to be your site's ID -->
+  <script>
+    window._gaq = [['_setAccount','UA-46711390-1'],['_trackPageview'],['_trackPageLoadTime']];
+    Modernizr.load({
+      load: ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js'
+    });
+  </script>
+    <script>
+	
+	</script>
+  
+  {% block my_script %} {% endblock %}
+{% endblock script %}

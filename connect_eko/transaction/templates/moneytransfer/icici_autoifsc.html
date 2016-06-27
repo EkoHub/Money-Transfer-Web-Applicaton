@@ -1,0 +1,1549 @@
+<!--copyright @ Eko India Financial Service Pvt. Ltd.-->
+{% extends "base_transaction.html" %}
+{% load staticfiles %}
+{% load humanize %}
+{% load url from future %}
+{% load activity_tags i18n %}
+{% load variables %}
+
+{% block my_content %}
+{{ block.super }}
+<!--link rel="stylesheet" href="{% static 'css/jquery.ui.combobox.css' %}"-->
+<link rel="stylesheet" href="{% static 'css/chosen.css' %}">
+<link rel="stylesheet" href="{% static 'css/progress.css' %}">
+<div class="row" style="padding-bottom:15px;">
+
+	<!--************************* Box 1 - START ********************-->
+	
+	<div data-bind="click: focusBox1" class="four columns trxnbox large" id="box1">
+	
+		<div class="boxheader" id="boxheader1">
+			<span class="boxheader-left-span textleft" style="width:13%;text-align:left;float:left;" id="sender_home_icon" >
+				<a tabindex="1" href="#" data-bind="click: $root.resetAll" class="ttip" data-tooltip="Start New Transaction" title="Start New Transaction" style="left:4px;text-align:left;color:#2980b9">
+					<i class="icon-home"></i>
+				</a>
+			</span>
+			Sender
+		</div>
+		<div class="boxbody textcenter" id="boxbody1">
+			<div id="box1_body_content" class="textcenter">
+				<div data-bind="css: {'warning': !senderCell.isBlank(), 'success': !(senderCell.hasError())}" class="prepend append field inputbox" id="div_sender_number">
+					<span class="adjoined"><i class="icon-mobile"></i></span>
+					<input class="wide text input" data-bind="value: senderCell, valueUpdate: 'afterkeydown', executeOnEnter: $root.senderInquiry, event: {focus: focusBox1}" type="text" placeholder="Sender Number" id="sender_number" name="sender_number" maxlength="10" onkeypress="return isNumber(event)" tabindex="1" autocomplete="off" autofocus />
+					<div data-bind="click: $root.senderInquiry, css: {'primary': (recipients().length == 0) && !(newRecipient()) && !(showSenderForm()), 'secondary': (recipients().length > 0) || (newRecipient()) || showSenderForm}" class="medium metro rounded btn active" id="btn_search">
+						<a href="#">Go</a>
+					</div>
+				</div>
+				
+				<div style="display: none;" data-bind="visible: showSenderForm">
+					<div class="prepend field inputbox" id="div_sender_name" data-bind="css: {'warning': (senderName.isBlank() && enrolClicked()), 'success': !(senderName.isBlank())}" >
+						<span class="adjoined"><i class="icon-user"></i></span>
+						<input class="xwide text input" data-bind="value: senderName, enable: showSenderForm, valueUpdate: 'afterkeydown', executeOnEnter: $root.enrollSender, hasFocus: focusEnrolSenderName, event: {focus: focusBox1, keydown: $root.resetEnrolClick}" type="text" tabindex="2" placeholder="Sender Name" id="sender_name" />
+					</div>	
+					
+					<div class="prepend field " id="div_sender_aadhar" data-bind="css: {'warning': (senderName.isBlank() && enrolClicked()), 'success': !(senderName.isBlank())}" >
+						
+					</div>
+										
+					<div class="bottom">
+						<div data-bind="click: $root.enrollSender, clickBubble: false, executeOnEnter: function(){$($element).click();}" class="medium primary metro rounded globalButton btn" tabindex="4" id="btn_confirmenrolsender">
+							<a href="#">Enroll</a>
+						</div>
+					</div>	
+				</div>
+				
+				<div id="box_verifyenrolment" style="display: none" data-bind="visible: showSenderVerificationForm">
+					<div class='prepend append field inputbox'>
+						<span class="adjoined">OTP</span>
+						<input class='xwide text input' data-bind="value: senderOTP, enable: showSenderVerificationForm, valueUpdate: 'afterkeydown', executeOnEnter: $root.verifyEnrolmentWithOTP, event: {focus: focusBox1}" tabindex="2" id="otp_verifyenrolment" name="otp_verifyenrolment" maxlength="3" onkeypress="return isNumber(event)" type='text' placeholder='Enter OTP' />
+						
+					</div>
+
+					<p class="small textcenter">Didn't receive OTP?  <a href='#' id='otp_text_enrolment' tabindex="3" style="text-decoration: underline;" data-bind="click: $root.verifyEnrolmentResendOTP, event: {focus: $root.focusTextEnrolmentOTP}"> Resend OTP</a></p>
+
+					<div class="bottom">
+						<div data-bind="click: $root.verifyEnrolmentWithOTP, clickBubble: false, executeOnEnter: function(){$($element).click();}" class="medium primary metro rounded globalButton btn" tabindex="4" id="btn_verify_enrolment">
+							<a href="#">Verify</a>
+						</div>
+					</div>
+				</div>
+				
+				<div data-bind="visible: !showSenderForm() && showSenderUsage" style="display: none">
+					<ul>
+					<!-- added by rohit lakshykar start to show name and aadaar -->
+						<li>
+							<div class="row">
+								<div class="prepend field inputbox" id="div_sender_name" data-bind="css: {'warning': (senderName.isBlank() && enrolClicked()), 'success': !(senderName.isBlank())}" >
+									<span class="adjoined"><i class="icon-user"></i></span>
+									<input class="xwide text input" data-bind="value: senderName,valueUpdate: 'afterkeydown'," type="text" tabindex="2" placeholder="Sender Name" id="sender_name1" />
+								</div>
+							</div>	
+						</li>
+						
+						<li>
+							
+							
+						</li>
+						
+						<li>
+                			<div class="row prepend field" style="margin-top:10px;padding-bottom:0px;padding-top:0px;margin-bottom:0px">
+                    			<span class="adjoined" ><i class="icon-book"></i></span>
+                    			
+                    			 <div class="xwide field progress" style="margin-bottom:0;" id="wallet_limit" role="progressbar" data-goal="0" aria-valuemax="100" style="float:right">
+                       				<div class="progress__bar" style="width:20%;float:left"><!-- <span class="progress__label"></span> --></div>
+                    			</div> 
+                       		</div>
+                       	
+                       		<div class="row" style="font-size: 10px;padding-bottom:0px;padding-top:0px">
+                    			<span id="limit_used" style="color:#e74c3c; font-size: 14px; padding-right: 5px;"></span>
+							 	<span id="limit_remaining" style="color:#f1c40f; font-size: 14px;"></span>
+                 			 </div>
+                 		</li>
+                 		<li>		 
+                    		<div class="row prepend field" style="margin-top:10px;padding-bottom:0px;margin-bottom:0px">	
+                    			<span class="adjoined" ><i class="icon-home"></i></span>
+                    			<div class="xwide field progress" style="margin-bottom:0;" id="bc_limit" role="progressbar" data-goal="0" aria-valuemax="100" style="float:right">
+                        			<div class="progress__bar" style="width:20%;float:left"><!-- <span class="progress__label"></span> --></div>
+                    			</div>
+                 			 </div>
+                 			 <div class="row" style="font-size: 10px;padding-bottom:0px;padding-top:0px">
+                    			<span id="limit_used_1" style="color:#e74c3c; font-size: 14px; padding-right: 5px;"></span>
+							 	<span id="limit_remaining_1" style="color:#f1c40f; font-size: 14px;"></span>
+                 			 </div>
+                 			 
+                 								
+						</li>
+					</ul>					
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-------------------------------------- Box 1 - END ------------------------------------------------>
+	<!-------------------------------------- Box 2 - START ---------------------------------------------->
+	
+	<div data-bind="click: focusBox2" class="four columns trxnbox large" id="box2">
+	
+		<div class="boxheader" id="boxheader2">			
+			<span data-bind="visible: (newRecipient()) && (recipients().length > 0), click: $root.recipientInquiry" class="boxheader-left-span textleft" style="display:none;width:10%;text-align:left;float:left;" id="recipient_back_icon" >
+				<a tabindex="5" href="#" title="Recipient List" style="left:4px;text-align:left;color:#2980b9;" data-bind="event: {focus: focusBox2}">
+					<i class="icon-arrow-left"></i>
+				</a>
+			</span>			
+			Recipient
+		</div>
+		
+		<div class="boxbody" id="boxbody2">
+			<div id="box2_body_content" class="textcenter">
+				<div data-bind='visible: (recipients().length > 0) && !(newRecipient())' style="display: none;">
+					<div class="scrollbox">
+						<table data-bind="foreach: recipients" style="border: none; background-color: transparent; margin-bottom: 0px;">
+							<tr data-bind="attr: (($data == $root.selectedRecipient()) ? {title: name_hover, tabindex: 4} : {title: name_hover, tabindex: -1}), click: $root.selectRecipient, executeOnDownArrow: true, executeOnUpArrow: true, executeOnEnter: function(){$($element).click(); $root.focusAmount(true); $root.recipientIndividualInquiry();}, clickBubble: false, event: {focus: focusBox2}" class="recipient" style="cursor: pointer;">
+								
+								<td data-bind="html: name"></td>
+								<td data-bind="html: account"></td>
+								
+								<td> <i class="icon-record" style="min-width:10px;" data-bind="style: { color: $data==$root.selectedRecipient() ? '#e74c3c' : '#E6E6FA' }"></i></td>
+							</tr>
+						</table>
+					</div>
+					<div class="bottom">
+						<div tabindex='5' data-bind="click: $root.triggerRecipientRegistration, css: {'primary': !(selectedRecipient()), 'secondary': selectedRecipient}, executeOnEnter: function(){$($element).click();}, event: {focus: focusBox2}" class="medium metro rounded btn globalButton" id="btn_addrecipient">
+							<a href="#">+ Add Recipient</a>
+						</div>			
+					</div>
+				</div>
+				 <div id="new_recipient" data-bind="visible: newRecipient, with: newRecipient" style="display: none;">
+					<ul>
+						<div>
+							
+								<select id="recipient_bank_selection" tabindex="6" data-bind="event: {focus: $root.highlightPicker, change: $root.actionOnRecipientBankSelection}" placeholder="Select Bank (Optional)" class="chosen-select" style="width: 285px; color: #000000; padding-bottom: 0px; padding-top: 0px; height: 27px; font-size: small; background: #F5F5F5; border: solid 1px #7f8c8d;" required>
+								
+									<option value="0"><a href="#" >Select Bank / Credit Card</a></option>
+									{% for bank_detail in bank_detail_list %}
+									<option value='{{ bank_detail.id }}' data-accnumlength='{{ bank_detail.acc_num_length }}' data-ifscprefix='{{ bank_detail.ifsc_prefix }}' data-ifscsuffixlength='{{ bank_detail.ifsc_suffix_length }}'><a href="#"> {{ bank_detail.name }}</a></option>
+									{% endfor %}
+								</select>
+							
+						</div>
+						<br/>
+						
+						<div data-bind="visible: (!$root.mandatoryRecipientBank() || ($root.mandatoryRecipientBank() && recipientBankSelected()))">
+						<li data-bind="css: {'warning': (account.isBlank() && registerRecipientClicked()), 'danger': (!account.isBlank() && recipientAccountNumError()), 'success': recipientFound() }" class="prepend field inputbox" id="div_rcpnt_accnt_no">
+							<span class="adjoined"><i class="icon-credit-card"></i></span>
+							<input data-bind="value: account, valueUpdate: 'afterkeydown',executeOnEnter:$root.registerRecipient, event: {focus: focusBox2, keydown: $root.resetRecipientAccountNumError}" class="xwide text input" type="text" tabindex="6" placeholder="Recipient Account Number" id="rcpnt_accnt_no" maxlength="20" onkeypress="return isNumber(event)"/>
+						</li>
+
+						
+
+						<div data-bind="css: {'warning': (ifsc.isBlank() && registerRecipientClicked() && !recipientFound() && !recipientIfscOptional()), 'success': (recipientFound())}" class="prepend field inputbox" id="div_rcpnt_ifsc">
+							<span class="adjoined">IFSC</span>
+							<input data-bind="value: ifsc, valueUpdate: 'afterkeydown',executeOnEnter:$root.registerRecipient, event: {keydown: $root.resetRegistrationClick}, attr: ((!recipientFound() && recipientIfscOptional()) ? {placeholder: 'Optional'} : {placeholder: 'IFSC Code'}), css: {'color_placeholder': recipientIfscOptional() && !recipientFound()}" class="xwide text input" tabindex="6" maxlength="11" type="text" placeholder="IFSC Code" id="rcpnt_ifsc" />
+						</div>
+						<div data-bind="css: {'warning': (name.isBlank() && registerRecipientClicked() && !recipientFound()), 'success': recipientFound()}" class="prepend field inputbox" id="div_rcpnt_name">
+							<span class="adjoined"><i class="icon-user"></i></span>
+							<input data-bind="value: name, valueUpdate: 'afterkeydown',executeOnEnter:$root.registerRecipient, event: {keydown: $root.resetRegistrationClick} " class="xwide text input" type="text" tabindex="6" placeholder="Recipient Name" id="rcpnt_name" />
+						</div>		
+						<div data-bind="visible: false" class="prepend field" id="div_rcpnt_foundtext">
+							<span class="small textcenter">Account Verified! Click Add to Register</span>							
+						</div>		
+						<div data-bind="css: {'warning': (cellnumber.isBlank() && registerRecipientClicked() && !recipientFound()), 'success': recipientFound()}" class="prepend append field inputbox" id="div_rcpnt_number">
+							<span class="adjoined"><i class="icon-mobile"></i></span>
+							<input data-bind="value: cellnumber, valueUpdate: 'afterkeydown',executeOnEnter:$root.registerRecipient " class="xwide text input" type="text" tabindex="7" placeholder="Recipient Mobile (Required)" id="rcpnt_number" maxlength="10" onkeypress="return isNumber(event)" />
+						</div>
+						</div>				
+					</ul>
+					<div class="bottom" data-bind="visible: (!$root.mandatoryRecipientBank() || ($root.mandatoryRecipientBank() && recipientBankSelected()))">
+						<div data-bind="click: $root.verifyRecipient, clickBubble: false,executeOnEnter: function() { $($element).click(); }, event: {focus: focusBox2}" class="medium primary metro rounded globalButton btn" tabindex="8" id="btn_confirmaverifyrecipient" >
+							<a href="#">Verify</a>
+						</div>
+						<div data-bind="click: $root.registerRecipient, clickBubble: false,executeOnEnter: function() { $($element).click(); }, event: {focus: focusBox2}" class="medium primary metro rounded globalButton btn" tabindex="8" id="btn_confirmaddrecipient" >
+							<a href="#">Add</a>
+						</div>
+						<div data-bind="click: $root.recipientInquiry, clickBubble: false,executeOnEnter: function() { $($element).click(); }, event: {focus: focusBox2}" class="medium secondary metro rounded globalButton btn" tabindex="8" id="btn_recipientlist" style="display: none;">
+							<a href="#">Next</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>		
+	
+	<!-------------------------------------- Box 2 - END ------------------------------------------------>
+	<!-------------------------------------- Box 3 - START ---------------------------------------------->
+			
+	<div data-bind="click: focusBox3" class="four columns trxnbox large" id="box3">		
+	
+		<div class="boxheader" id="boxheader3">
+			Transaction
+		</div>	
+		
+		<div class="boxbody" id="boxbody3">
+			<div id="box3_body_content" class="textcenter" data-bind="visible: selectedRecipient() && !(newRecipient()) && (selectedRecipient().impsFlag || selectedRecipient().neftFlag)" style="display: none;">
+				<ul>
+					<li data-bind="css: {'warning': (amount.isBlank() && sendMoneyClicked()), 'success': !(amount.isBlank())}" class="prepend field inputbox">
+						<span class="adjoined"><i class="icon-ticket"></i></span>
+						<input class="xwide text input" data-bind="value: amount,valueUpdate: 'afterkeydown', executeOnEnter: $root.sendMoney, hasFocus: focusAmount, event: {focus: focusBox3, keydown: $root.resetSendMoneyClick}" type="text" tabindex="9" placeholder="Amount" maxlength="4" id="amnt_to_send" onkeypress="return isNumber(event)" />						
+					</li>
+<!----------------------------------------------------------------Change here for your authentication method------------------------------------------------>					
+					<!-- <li data-bind="css: {'warning': (okekey.isBlank() && sendMoneyClicked()), 'danger': OkekeyError, 'success': (!(okekey.isBlank()) && !(OkekeyError()))}" class="prepend field inputbox">
+						<span class="adjoined"><i class="icon-key"></i></span>
+						<input class="xwide text input" data-bind="value: okekey, valueUpdate: 'afterkeydown', executeOnEnter: $root.sendMoney, event: {keydown: $root.resetSendMoneyClick}" type="text" tabindex="10" placeholder="OkeKey" id="okekey" maxlength="10" onkeypress="return isNumber(event)" />
+					</li> -->		
+					<li>
+						<p>Transaction Mode</p>
+					</li>						
+					<li class="field">
+						<div class="picker primary textcenter" style="width: 285px;">
+							<select id="transaction_mode_select" tabindex="11" data-bind="event: {focus: $root.highlightPickerMode, change: $root.refreshIfscTransaction}" class="textcenter" style="color: #000000; padding-bottom: 0px; padding-top: 0px; height: 27px; font-size: small; background: #F5F5F5;">
+								
+								<option value="2"><a href="#">IMPS</a></option>
+								<option value="1"><a href="#">NEFT</a></option>
+								<option value="0"><a href="#">AUTO (System decides)</a></option>								
+							</select>
+						</div>
+					</li>
+					
+					<div data-bind="css: {'warning': (ifscTransaction.isBlank() && sendMoneyClicked()), 'danger': ifscTransactionError, 'success': (!(ifscTransaction.isBlank()) && !(ifscTransactionError()))}, event: {focus: focusBox3, keydown: $root.resetSendMoneyClick}" class="prepend field inputbox" id="div_rcpnt_ifsc_trxn" style="display: none;">
+						<span class="adjoined">IFSC</span>
+						<input data-bind="value: ifscTransaction, valueUpdate: 'afterkeydown'" class="xwide text input" tabindex="12" maxlength="11" type="text" placeholder="IFSC Code" id="rcpnt_ifsc_trxn" />
+					</div>				
+				</ul>
+				<div class="bottom">
+					<div class="medium primary metro rounded btn globalButton" tabindex="13" id="btn_confirmtransact" data-bind='click: $root.sendMoney, executeOnEnter: function() { $($element).click(); }'>
+						<a href="#">Send Money</a>
+					</div>		
+				</div>	
+			</div>
+			
+			<div id="box3_body_content_none" class="textcenter" data-bind="visible: selectedRecipient() && !(newRecipient()) && (!selectedRecipient().impsFlag && !selectedRecipient().neftFlag)" style="display: none;">
+				<span>Currently remittance to this bank is not available. Please try after sometime</span>
+			</div>
+		</div>
+		
+	</div>
+	
+	<!-------------------------------------- Box 3 - END ------------------------------------------------>
+	
+</div>
+
+<div id="trxn_response" class="skip" gumby-goto="top" gumby-duration="600" style="display:none; font-size:10px;">
+</div>
+
+<br/>
+
+{% endblock my_content %}
+	
+{% block my_script %}
+	<script type='text/javascript' src="{% static 'js/knockout-3.0.0.js' %}"></script>
+	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<!--script type='text/javascript' src="{% static 'js/jquery.ui.combobox.js' %}"></script-->
+	<script type='text/javascript' src="{% static 'js/chosen.jquery.js' %}"></script>
+	<script type='text/javascript' id="viewModelTemplate">
+	
+		function focusBox1() {
+			$("#box1").addClass("active");
+			$("#box2").removeClass("active");
+			$("#box3").removeClass("active");				
+		}
+		
+		function focusBox2() {
+			$("#box2").addClass("active");
+			$("#box1").removeClass("active");
+			$("#box3").removeClass("active");	
+		}
+		
+		function focusBox3() {
+			$("#box3").addClass("active");
+			$("#box2").removeClass("active");
+			$("#box1").removeClass("active");	
+		}
+	
+		// Overall viewmodel for this screen, along with initial state
+		function TransactionViewModel() {
+			var self = this;
+			self.senderCell = ko.observable().extend({ required: "Please enter sender cell number", fixedLength:10});
+			self.senderName = ko.observable().extend({ required: "Please enter sender name"});
+			self.amount = ko.observable().extend({ required: "Please enter amount"});
+			// self.okekey = ko.observable().extend({ required: "Please enter okekey"});
+			self.ifscTransaction = ko.observable().extend({ required: "Please enter IFSC code"});
+			self.ifscTransactionError = ko.observable(false);
+			self.recipients = ko.observableArray([]);
+			self.selectedRecipient = ko.observable().extend({ required: "Please enter amount"});
+			self.newRecipient = ko.observable();
+			self.showSenderForm = ko.observable(false);
+			self.focusAmount = ko.observable(false);
+			self.focusEnrolSenderName = ko.observable(false);
+			self.focusSenderMobile = ko.observable(false);
+			// self.OkekeyError = ko.observable(false);
+			self.sendMoneyClicked = ko.observable(false);
+			self.enrolClicked = ko.observable(false);
+	
+			self.accountLookup = ko.observable(false);
+			self.mandatoryRecipientBank = ko.observable(false);
+			
+			self.showSenderUsage = ko.observable(false);
+			self.senderAadhaar = ko.observable();
+			// self.senderAadhaarUpdate = ko.observable().extend({ required: "Please enter sender aadhaar"});  /*added by lakshykar rohit aug 13  */
+			
+			//added by rohit lakshykar aug 17 start
+			self.showSenderVerificationForm = ko.observable(false);
+			//self.recipientOTP = ko.observable().extend({ required: "Please enter OTP"});
+			self.senderOTP = ko.observable().extend({ required: "Please enter OTP"});
+			self.enrolOTPRequired = ko.observable(false);
+			self.txOTPRequired = ko.observable(false);
+			self.beneRegOTPRequired = ko.observable(false);
+			self.updateAadhaarClicked=ko.observable(false);
+			
+			self.senderInquiry = function senderInquiry() {
+				if(self.senderCell().length == 10) {
+					self.showSenderVerificationForm(false);
+					$('#idProofErrorOnEnroll').hide();
+					$('#idProofErrorOnUpdate').hide();
+					$('.loading').show();
+					Dajaxice.transaction.senderInquiry_ppi(self.senderInquiry_response, {
+						'senderNumber': self.senderCell()
+					});
+
+					// Clear Amount & OkeKey
+					self.amount('');
+					// self.okekey('');
+					self.resetSendMoneyClick();
+				}
+
+				// Added 1 May 2015 for PPI. Reset any previous sender name (since, a new name will be expected at this point)
+				self.senderName("");
+				// self.senderAadhaarUpdate("");
+			};
+
+
+			self.senderInquiry_response = function senderInquiry_response(data) {
+				if(data.status == "ENQR_SUCCESS") {
+					//console.log(data.status)
+					self.recipientInquiry();
+					self.showSenderForm(false);
+					focusBox2();					
+				}else if(data.status == "OTP_VERIFIC_PENDING") {
+					self.addMessage(data);
+					self.showSenderForm(false);
+					self.showSenderUsage(false);
+					self.showSenderVerificationForm(true);
+					self.enrolOTPRequired(true);
+					$("#otp_verifyenrolment").focus();
+					$('.loading').hide();
+				}else if(data.status == "KYC_VERIFIED" || data.status == "KYC_IN_PROGRESS" || data.status == "NON_KYC_ACTIVE" || data.status == "KYC_REJECTED") {
+					self.recipientInquiry();
+					if(data.responseText) {
+						//Logic to extract and display sender limit
+						var responseLineArr = data.responseText.split("<br/>");
+						var remaining = '', total = '';
+
+						if(data.status == "KYC_VERIFIED")
+							total = '25000';
+						else
+							total = '10000';
+
+						//console.log("Total : "+total);
+						
+						for(var i = 0; i < responseLineArr.length; ++i) {
+							if(responseLineArr[i].indexOf("Remaining limit") !== -1) {
+								//remaining = addDecoration(responseLineArr[i].split(".")[1]) + "." + responseLineArr[i].split(".")[2];
+								remaining = responseLineArr[i].split(".")[1] + "." + responseLineArr[i].split(".")[2];
+							}
+						}
+						//console.log("Remaining : "+remaining);
+						if(remaining !== '') {
+							self.showSenderUsage(true);
+							//prepareAndDisplayChart(remaining, total);
+							$("#limit_used").text( ((parseInt(total, 10) - parseInt(remaining, 10)) + "").replace(/([0-9]{1,2}?)(?=(?:[0-9]{2})*[0-9]{3}(?:\.[0-9]+)?$)/g, "$1,") + " used");
+							$("#limit_remaining").text( (remaining.split(".")[0].replace(/[^0-9]+/g, '')+"").replace(/([0-9]{1,2}?)(?=(?:[0-9]{2})*[0-9]{3}(?:\.[0-9]+)?$)/g, "$1,") + " left");
+						}
+
+						// Updated 1 May 2015 for PPI....Show sender Name (if already enrolled)
+						//self.senderName(data.senderName);	// TODO: data.senderName
+					}
+				}
+				else if(data.status == "NOT_ENROLLED") {
+					self.addMessage(data);
+					self.showSenderForm(true);
+					focusBox1();
+					self.focusEnrolSenderName(true);
+					$('.loading').hide();
+					self.enrolOTPRequired(true);
+				}
+				else {
+					self.addMessage(data);
+					$('.loading').hide();
+				}
+
+				// Edited 29 Apr by Kr. Abhishek for PPI
+				// Check if OTP is required
+				if (data.txotp != null)
+				{
+					self.txOTPRequired(data.txotp.trim()=='1');
+				}
+
+				if (data.beneregotp != null)
+				{
+					self.beneRegOTPRequired(data.beneregotp.trim()=='1');
+				}
+
+				
+				
+				
+
+				
+			};
+			
+
+			self.enrollSender = function(){
+				self.enrolClicked(true);
+				if(!(self.senderCell() && self.senderName())){
+					if(!self.senderName())
+						$("#sender_name").focus();
+					return false;
+				};
+				
+				$('.loading').show();
+				Dajaxice.transaction.customerenrolment_icici(self.enrollSenderResponse, {
+					'senderNumber': self.senderCell(),
+					'senderName': self.senderName()
+					   
+				});
+			};
+			
+			
+			 
+			self.enrollSenderResponse = function(data){
+
+				if(data.status == "VERIFICATION_PENDING" && self.enrolOTPRequired()){
+					self.showSenderForm(false);
+					self.showSenderVerificationForm(true);
+					$("#otp_verifyenrolment").focus();
+					focusBox1();
+				}else if(data.status == "KYC_FAILED")
+				{
+					$('.loading').hide();
+					$('#idProofErrorOnEnroll').show();
+					$('#idProofErrorOnUpdate').show();
+				}else if (data.status == "ENROLMENT_SUCCESS" || data.status == "AADHAAR_UPDATED")
+				{
+					$('#idProofErrorOnEnroll').hide();
+					$('#idProofErrorOnUpdate').hide();
+					$('.loading').hide();
+					//self.addMessage(data);
+					self.senderOTP('');
+					self.showSenderForm(false);
+					self.showSenderVerificationForm(false);
+					self.showSenderUsage(true);
+					
+					if(data.sender_aadhaar != '')
+					{
+						
+							$("#btn_uid_update").hide();
+							$("#disc1").hide();
+							$("#sender_aadhaar_update").attr("readonly", true);
+						
+						self.senderAadhaarUpdate(data.sender_aadhaar);
+					}else{
+						$("#btn_uid_update").show();
+						//self.senderAadhaarUpdate("");
+						$("#sender_aadhaar_update").attr("readonly", false);
+						$("#disc1").show();
+					}
+					
+					if(data.sender_name != '')
+					{
+						self.senderName(data.sender_name);
+						$("#sender_name1").attr("readonly", true);						
+					}else{
+						self.senderName("");
+						$("#sender_name1").attr("readonly", false);
+					}
+					
+					self.showUsage(data);
+					if(data.status == "AADHAAR_UPDATED"){
+						self.addMessage(data);
+						self.recipientInquiry();	
+					}else{
+						self.triggerRecipientRegistration();
+					}
+					focusBox2();
+				}else if(data.status == "ALREADY_ENROLED") {
+					self.recipientInquiry();
+				}
+				self.addMessage(data);
+				$('.loading').hide();
+			};
+			//added by rohit lakshykar
+			
+			self.verifyEnrolmentWithOTP = function verifyEnrolmentWithOTP() {
+				if(!self.senderCell()){
+					$("#sender_number").focus();
+					return false;
+				}
+				if(!self.senderOTP()){
+					$("#otp_verifyenrolment").focus();
+					return false;
+				};
+				
+				$('.loading').show();
+				Dajaxice.transaction.customerenrolmentotpverification_ppi(self.verifyEnrolmentWithOTP_response, {
+					'senderNumber': self.senderCell(),
+					'otp': self.senderOTP()
+				});
+			};
+
+			self.verifyEnrolmentWithOTP_response = function verifyEnrolmentWithOTP_response(data) {
+				$('.loading').hide();
+				self.addMessage(data);
+				if(data.status=="ENROLMENT_OTP_VERIFICATION_SUCCESS") {
+					self.senderOTP('');
+					self.showSenderForm(false);
+					self.showSenderVerificationForm(false);
+					if(data.sender_aadhaar != ''){
+						
+							$("#btn_uid_update").hide();
+							$("#disc").hide();
+						
+					}else{
+						$("#btn_uid_update").show();
+						$("#disc").show();
+						$("#sender_aadhaar_update").attr("readonly", false);
+					}
+					
+					
+					self.recipientInquiry();					
+					self.showSenderUsage(true);
+					self.showUsage(data);
+					
+					focusBox2();
+				}
+				else {
+					$("#otp_verifyenrolment").focus();
+				}
+			};
+
+			self.verifyEnrolmentResendOTP = function verifyEnrolmentResendOTP() {
+				if(!self.senderCell()){
+					$("#sender_number").focus();
+					return false;
+				};
+				
+				$('.loading').show();
+				Dajaxice.transaction.customerenrolmentresendotp_ppi(self.verifyEnrolmentResendOTP_response, {
+					'senderNumber': $("#sender_number").val()
+				});
+			};
+
+			self.verifyEnrolmentResendOTP_response = function verifyEnrolmentResendOTP_response(data) {
+				$('.loading').hide();
+				self.addMessage(data);
+			};
+
+
+			self.verifyRecipientWithOTP = function verifyRecipientWithOTP() {
+				if(!self.recipientOTP()){
+					$("#otp_verifyrecipient").focus();
+					return false;
+				};
+
+				$('.loading').show();
+
+				Dajaxice.transaction.recipientregistrationotpverification_ppi(self.verifyRecipientWithOTP_response, {
+					'senderNumber': self.senderCell(),
+					'otp': self.recipientOTP(),
+					'recipientAccountOrCode': ( (self.selectedRecipient() != null && typeof self.selectedRecipient().code != 'undefined') ? self.selectedRecipient().code : $("#rcpnt_accnt_no").val() )
+				});
+			};
+
+			self.verifyRecipientWithOTP_response = function verifyRecipientWithOTP_response(data) {
+				$('.loading').hide();
+				self.addMessage(data);
+				if(data.status == "RECIPIENT_VERF_SUCCESS") {
+					self.recipientInquiry();
+				}
+				else {
+					$("#otp_verifyrecipient").focus();
+				}
+			};
+
+			self.verifyRecipientResendOTP = function verifyRecipientResendOTP() {
+				$('.loading').show();
+				Dajaxice.transaction.recipientregistrationresendotp_ppi(self.verifyRecipientResendOTP_response, {
+					'senderNumber': self.senderCell(),
+					'recipientAccountOrCode': self.selectedRecipient().code
+				});
+			};
+
+			self.verifyRecipientResendOTP_response = function verifyRecipientResendOTP_response(data) {
+				$('.loading').hide();
+				self.addMessage(data);
+				$('#otp_verifyrecipient').focus();
+			};
+
+			
+			//added by rohit lakshykar
+			self.addRecipient = function(name,account,code,ifsc,cellnumber,channel,ifsc_status,name_hover) {
+				self.recipients.push({
+					name:name,
+					account:account,
+					code:code,
+					ifsc:"",
+					cellnumber:"",
+					impsFlag: (channel == 1 ? false : true),
+					neftFlag: (channel ==  2 ? false : true),
+					impsIfscRequiredFlag: (ifsc_status == 4 ? true : false),
+					neftIfscRequiredFlag: (ifsc_status == 4  || ifsc_status == 2? true : false),
+					impsUnavailableFlag: (channel == 1 ? true : false),
+					name_hover:name_hover
+				});
+			};
+			
+			self.removeRecipient = function(recipient) { 
+				self.recipients.remove(recipient) 
+			};
+			
+			self.selectRecipient = function(recipient) { 
+				self.selectedRecipient(recipient);focusBox2();	
+				self.resetTransactionModes();			
+				self.refreshTransactionModes();
+				
+			};
+			
+			self.resetTransactionModes = function() {
+				$("#transaction_mode_select option[value='0']").removeAttr('disabled');
+				$("#transaction_mode_select option[value='0']").show();
+				$("#transaction_mode_select option[value='1']").removeAttr('disabled');
+				$("#transaction_mode_select option[value='1']").show();
+				$("#transaction_mode_select option[value='2']").removeAttr('disabled');
+				$("#transaction_mode_select option[value='2']").text('IMPS');
+				$("#transaction_mode_select option[value='2']").show();
+			};
+			
+			self.refreshTransactionModes = function() { 
+				if(self.selectedRecipient().impsFlag) {
+					$('#transaction_mode_select').val('2');
+					if(!self.selectedRecipient().neftFlag) {
+						// disable neft
+						$("#transaction_mode_select option[value='1']").attr('disabled', 'disabled');
+						$("#transaction_mode_select option[value='1']").hide();
+						// disable auto
+						$("#transaction_mode_select option[value='0']").attr('disabled', 'disabled');
+						$("#transaction_mode_select option[value='0']").hide();
+					}					
+				}
+				else {
+					// disable auto
+					$("#transaction_mode_select option[value='0']").attr('disabled', 'disabled');
+					$("#transaction_mode_select option[value='0']").hide();
+					
+					if(self.selectedRecipient().neftFlag) {
+						$('#transaction_mode_select').val('1')
+						// disable imps, in cases when temporarily or permanently unavailable
+						$("#transaction_mode_select option[value='2']").attr('disabled', 'disabled');
+						
+						// hide imps, if permanently unavailable, else just display a message
+						if(self.selectedRecipient().impsUnavailableFlag) {
+							$("#transaction_mode_select option[value='2']").hide();
+						}
+						else {
+							$("#transaction_mode_select option[value='2']").text('IMPS (temporarily not available)');
+						}												
+					}
+					else {
+					// no transaction modes available
+					};
+				}
+				self.refreshIfscTransaction();
+			};
+			
+			self.refreshIfscTransaction = function() { 
+				self.ifscTransaction("");
+				if($('#transaction_mode_select').val() == '2') {
+					if(self.selectedRecipient().impsIfscRequiredFlag) {
+						$('#div_rcpnt_ifsc_trxn').show();
+					}
+					else {
+						$('#div_rcpnt_ifsc_trxn').hide();
+					}					
+				}
+				else if($('#transaction_mode_select').val() == '1') {
+					if(self.selectedRecipient().neftIfscRequiredFlag) {
+						$('#div_rcpnt_ifsc_trxn').show();
+					}
+					else {
+						$('#div_rcpnt_ifsc_trxn').hide();
+					}
+				}				
+			};
+			
+			self.showRecipientForm = function() { 
+				self.newRecipient(new Recipient("","","","","", false, false, false, false));
+			};
+			
+			self.triggerRecipientRegistration = function() {
+				self.showRecipientForm();
+				self.mandatoryRecipientBank(true);
+				$("#recipient_bank_selection").focus();
+				//$("#rcpnt_accnt_no").focus();
+				$("#rcpnt_ifsc").attr("placeholder", "IFSC Code");
+				$("#rcpnt_name").attr("placeholder", "Recipient Name");
+				$("#div_rcpnt_foundtext").hide("slow");
+				$("#btn_recipientlist").hide();
+				self.bindSelection();
+			};
+			
+			self.registerRecipient = function() {
+				self.newRecipient().registerRecipientClicked(true);
+				if(!(self.senderCell() && self.newRecipient().account())){
+					if(!self.newRecipient().account()) {
+						$("#rcpnt_accnt_no").focus();						
+						return false;
+					}
+				}
+				if(!self.newRecipient().ifsc() && self.newRecipient().recipientFound() == false 
+					&& self.newRecipient().recipientIfscOptional() == false) {
+					$("#rcpnt_ifsc").focus();
+					return false;
+				}
+				if(!self.newRecipient().name() && self.newRecipient().recipientFound() == false) {
+					$("#rcpnt_name").focus();
+					return false;
+				}
+				var cellNumber = self.newRecipient().cellnumber();
+				if(!cellNumber || cellNumber.length < 10){
+					$("#rcpnt_number").focus();
+					return false;
+				}
+				
+				$('.loading').show();	
+				Dajaxice.transaction.recipientregistration_icici(self.registerRecipientResponse, {
+					'senderNumber': self.senderCell(),
+					'recipientAccountNo': self.newRecipient().account(),
+					'recipientIfsc': self.newRecipient().ifsc(),
+					'bankId': $("#recipient_bank_selection").val(),
+					'recipientName': self.newRecipient().name(),
+					'recipientMobile': self.newRecipient().cellnumber(),
+					'recipientFound': (self.newRecipient().recipientFound() ? '1' : '0')
+				});
+			};
+			
+			self.registerRecipientResponse = function(data){
+				
+				if(data.status == "RECIPIENT_REG_SUCCESS"){
+					self.recipientInquiry();
+					self.newRecipient(null);
+				}
+				else if(data.status == "RECIPIENT_REG_FAILED_INVALID_ACCOUNT_NUM") {
+					self.newRecipient().recipientAccountNumError(true);
+					$("#rcpnt_accnt_no").focus();			
+				}
+				else if(data.status == "RECIPIENT_REG_FAILED_INVALID_IFSC") {
+					$("#rcpnt_ifsc").focus();			
+				}
+				else if(data.status == "RECIPIENT_ALREADY_REGISTERED") {
+					$("#rcpnt_number").focus();	
+					$("#btn_confirmaddrecipient").hide();
+					$("#btn_recipientlist").show('slow');		
+				}
+				else {
+					$("#rcpnt_accnt_no").focus();
+				}
+				self.addMessage(data);
+				$('.loading').hide();						
+			};
+			
+			//added by rohit lakshykar start <---
+			self.verifyRecipient = function() {
+				self.newRecipient().registerRecipientClicked(true);
+				if(!self.newRecipient().account()){
+						$("#rcpnt_accnt_no").focus();						
+						return false;
+				};
+				
+				if(!self.newRecipient().ifsc() && self.newRecipient().recipientFound() == false 
+					&& self.newRecipient().recipientIfscOptional() == false) {
+					$("#rcpnt_ifsc").focus();
+					return false;
+				};
+				
+				$('.loading').show();	
+				Dajaxice.transaction.recipientVerifiaction_icici(self.verifyRecipientResponse, {
+					'senderNumber': self.senderCell(),
+					'recipientAccountNo': self.newRecipient().account(),
+					'recipientIfsc': self.newRecipient().ifsc(),
+					'bankId': $("#recipient_bank_selection").val(),
+					'recipientFound': (self.newRecipient().recipientFound() ? '1' : '0')
+				});
+			};
+			
+			//verify recipient response
+			self.verifyRecipientResponse = function(data){
+				self.addMessage(data);
+				console.log("hey");
+				if(data.status == 'RECIPIENT_VERIFIED'){
+					$("#div_rcpnt_name").show();
+					$("#div_rcpnt_number").show();
+					$("#btn_confirmaddrecipient").show();
+	    			$("#btn_confirmaverifyrecipient").hide();
+					self.newRecipient().name(data.rcpt_name);
+					//$("#rcpnt_name").attr("readonly", true);
+				}else if(data.status == 'VERIFICATION_NOT_AVAILABLE'){
+					//$("#rcpnt_name").attr("readonly", false);
+					self.newRecipient().name("");
+					$("#div_rcpnt_name").show();
+					$("#div_rcpnt_number").show();
+					$("#btn_confirmaddrecipient").show();
+	    			$("#btn_confirmaverifyrecipient").hide();
+				}else if (data.status == 'RECIPIENT_ALREADY_REGISTERED'){
+					self.recipientInquiry();
+					self.newRecipient(null);
+				}else if (data.status == 'RECIPIENT_VERIFICATION_FAILED_INVALID_ACCOUNT_NUM'){
+					$("#div_rcpnt_name").hide();
+					$("#rcpnt_accnt_no").focus();
+					$("#btn_confirmaddrecipient").hide();
+	    			$("#btn_confirmaverifyrecipient").show();
+				}else if(data.status == 'RECIPIENT_VERIFICATION_FAILED_INVALID_IFSC'){
+					$("#rcpnt_ifsc").focus();
+					$("#div_rcpnt_name").hide();
+					$("#btn_confirmaddrecipient").hide();
+	    			$("#btn_confirmaverifyrecipient").show();
+				}
+				$(".loading").hide();
+			}
+			
+			//-- end>
+			
+			self.recipientInquiry = function recipientInquiry(){
+				console.log(self.senderCell())
+				if(self.senderCell().length == 10) {
+					$('.loading').show();
+					Dajaxice.transaction.recipientInquiry_icici(self.populateRecipientList, {
+						'senderNumber': self.senderCell()		
+					});
+				}				
+			};
+			
+			self.populateRecipientList = function populateRecipientList(data) {
+				self.recipients([]); 
+				self.senderName("");
+				self.showRecipientForm(false);
+				self.showSenderForm(false);
+				self.newRecipient(null);
+				self.selectedRecipient(null);
+				$('#idProofErrorOnUpdate').hide();
+				$('#idProofErrorOnEnroll').hide();
+				if(data.status == "ENROLLED" && data.recipient_count == 0) {
+					//self.showRecipientForm(true);
+					self.showSenderUsage(true);
+					if(data.sender_aadhaar != ''){
+						
+							$("#btn_uid_update").hide();
+							$("#sender_aadhaar_update").attr("readonly", true);
+							$("#disc1").hide();
+						
+						self.senderAadhaarUpdate(data.sender_aadhaar);
+					}else
+					{
+						$("#btn_uid_update").show();
+						$("#sender_aadhaar_update").attr("readonly", false);
+						$("#disc1").show();
+					}
+					
+					if(data.sender_name != '')
+					{
+						self.senderName(data.sender_name);
+						$("#sender_name1").attr("readonly", true);						
+					}else{
+						self.senderName("");
+						$("#sender_name1").attr("readonly", false);
+					}
+					self.triggerRecipientRegistration();
+					self.addMessage(data);
+					focusBox2();
+					$("#rcpnt_accnt_no").focus();
+					self.showUsage(data);
+				} 
+				else if(data.status == "ENROLLED" && data.recipient_count > 0) {
+					if(data.sender_aadhaar != '')
+					{
+						
+							$("#btn_uid_update").hide();
+							$("#sender_aadhaar_update").attr("readonly", true);
+							$("#disc1").hide();
+						
+						self.senderAadhaarUpdate(data.sender_aadhaar);
+					}else{
+						$("#btn_uid_update").show();
+						//self.senderAadhaarUpdate("");
+						$("#sender_aadhaar_update").attr("readonly", false);
+						$("#disc1").show();
+					}
+					
+					if(data.sender_name != '')
+					{
+						self.senderName(data.sender_name);
+						$("#sender_name1").attr("readonly", true);						
+					}else{
+						self.senderName("");
+						$("#sender_name1").attr("readonly", false);
+					}
+					
+					for(i=0; i < data.recipient_count;++i){
+						
+						var name = data.recipients[i].recipient_name;
+						var account = data.recipients[i].account;
+						var name_hover  = name+"("+data.recipients[i].account+")";
+						if (name.length > 13)
+						{
+							name = name.substring(0,11) +"&hellip;";
+						}
+						if(account.length >6)
+						{
+							account = '&hellip;' + account.substring(account.length - 7,account.length);
+						}
+
+						self.addRecipient(
+							name,
+							account,
+							data.recipients[i].recipient_id,
+							"",
+							"",
+							data.recipients[i].available_channel,
+							data.recipients[i].ifsc_status,
+							name_hover
+						);
+					}
+					
+					focusBox2();	
+					self.showUsage(data);		
+				} 
+				else if(data.status == "NOT_ENROLLED"){
+					self.showSenderForm(true);
+					self.addMessage(data);
+					$("#sender_name1").attr("readonly", false);
+					$("#sender_aadhaar_update").attr("readonly", false);
+					$("#disc").show();
+					focusBox1();
+					self.focusEnrolSenderName(true);					
+				} 
+				else {
+					self.addMessage(data);
+					focusBox1();
+				}
+				$('.loading').hide();
+			};
+			
+			self.showUsage = function showUsage(data) {
+				if(data.responseText !== null) {
+					//Logic to extract and display sender limit
+					var responseLineArr = data.responseText.split("<br/>");		
+					
+					var walletLimit = '', walletUsedLimit = '', bcLimit = '', bcUsedLimit = '',walletRemainingLimit= '', bcReminingLimit= '';    
+						walletLimit = parseInt(data.wallet_limit);
+						
+						walletUsedLimit = walletLimit - parseInt(data.remaining_wallet_limit);
+						
+						walletRemainingLimit=parseInt(data.remaining_wallet_limit);
+						if (walletUsedLimit <= 0){
+							walletUsedLimit = 0.0;
+						}
+						
+						if(walletRemainingLimit < 0 ){
+							walletRemainingLimit=0.0;
+						}
+							
+							
+						bcLimit = parseInt(data.bc_limit);
+						bcUsedLimit = bcLimit - parseInt(data.remaining_bc_limit);
+						bcReminingLimit=parseInt(data.remaining_bc_limit);
+						
+						if (bcUsedLimit <= 0){
+							bcUsedLimit = 0.0;
+						}	
+						
+						if(bcReminingLimit < 0){
+							bcReminingLimit=0.0;
+						}
+						
+						self.showSenderUsage(true);
+						
+						$("#wallet_limit").attr("data-goal", walletUsedLimit);
+						$("#wallet_limit").attr("aria-valuemax", bcLimit);
+						
+						console.log("PROGRESS:::::::: ", walletUsedLimit, walletLimit, Math.ceil(walletUsedLimit*100/walletLimit));
+						$("#wallet_limit").asProgress("go", Math.ceil(walletUsedLimit*100/walletLimit));
+						
+						
+						$("#limit_used").text(addDecoration(walletUsedLimit + "") + " used");
+						$("#limit_remaining").text(addDecoration(walletRemainingLimit+"".split(".")[0]) + " left");
+
+						$("#bc_limit").attr("data-goal", bcUsedLimit);
+						$("#bc_limit").attr("aria-valuemax", bcLimit); 
+						
+						
+						console.log("PROGRESS:::::::: ", bcUsedLimit, bcLimit, Math.ceil((parseInt(bcLimit)-parseInt(bcUsedLimit))*100/bcLimit));
+						
+						$("#bc_limit").asProgress("go", Math.ceil(bcUsedLimit*100/bcLimit));
+						
+						
+						$("#limit_used_1").text(addDecoration(bcUsedLimit + "") + " used");
+						$("#limit_remaining_1").text(addDecoration(bcReminingLimit+"".split(".")[0]) + " left");
+								
+				}
+			};
+			
+			self.addMessage = function addMessage(data){
+				$("#trxn_response").prepend("<div class='current_msg row'><div id='status_mssg' class='mssgbox'><p class='medium'>" + data.responseText + "</p></div></div>");
+				$('#trxn_response').show("slow");
+			};
+			
+			self.sendMoney = function sendMoney(){
+				self.sendMoneyClicked(true);
+				if(!(self.senderCell() && self.amount() && self.selectedRecipient().code )){
+					if(!self.amount())
+						$("#amnt_to_send").focus();
+					
+						
+					return false;
+				};
+				
+				if(self.amount() == "0") {
+					alert("Amount cannot be 0");
+					$("#amnt_to_send").focus();
+					return false;
+				}
+						
+				
+				
+				
+				if(($('#transaction_mode_select').val() == '2' && self.selectedRecipient().impsIfscRequiredFlag) 
+					|| ($('#transaction_mode_select').val() == '1' && self.selectedRecipient().neftIfscRequiredFlag)) {
+					if(self.ifscTransaction().length < 11) {
+						self.ifscTransactionError(true);
+						$('#rcpnt_ifsc_trxn').focus();
+						return false;
+					}
+				}
+				
+				$('.loading').show();
+				$("#refresh_label").addClass("spin");
+				Dajaxice.transaction.moneytransfer_icici(self.transactionResponse, {
+					'senderNumber': self.senderCell(),
+					'recipientAccountCode': self.selectedRecipient().code,
+					'amount': self.amount(),
+					// 'okekey': self.okekey(),
+					'transactionMode': $('#transaction_mode_select').val(),
+					'ifscTransaction': (self.ifscTransaction() ? self.ifscTransaction() : ''),		
+				});	
+			};
+			
+			self.transactionResponse = function transactionResponse(data){
+				
+							
+				if(data.status == 'SUCCESS' && data.responseText !== null) {
+					
+					
+					//If balance and okekey both were found, update the label, else skip update
+					if(data.balance.length > 0 && data.okekey.length > 0) {
+						$("#balance").text("Balance: \u20b9 " + (addDecoration(data.balance) ));
+						$("#signature").text("Last Okekey: " + data.okekey);
+						$("#timestamp").show();
+						$("#timestamp").text("As of " + data.timestamp);
+						setUsedCount(data.okekey);
+						checkAndShowRegisterBookletPrompt();
+						$("#refresh_label").removeClass("spin");
+						self.recipientInquiry();				
+						self.addMessage(data);
+						$('.loading').hide();
+						}					
+				}
+				else
+				{
+					self.recipientInquiry();
+			         $("#refresh_label").removeClass("spin");				
+					self.addMessage(data);
+					$('.loading').hide();
+				}
+					
+			};
+			
+			self.resetAll = function resetAll(){
+				self.recipients([]);  
+				self.senderName("");
+				self.showRecipientForm(false);
+				self.showSenderForm(false);
+				self.newRecipient(null);
+				self.selectedRecipient(null);
+				self.amount(null);
+				// self.okekey(null);
+				self.senderCell(null);
+				self.clearMessage();
+				self.focusAmount(false);
+				// self.OkekeyError(false);
+				self.showSenderUsage(false);
+				$('#transaction_mode_select').val('0');
+				$("#sender_name").attr("readonly", false);
+				$("#sender_aadhaar_update").attr("readonly", false);
+				$('#idProofErrorOnUpdate').hide();
+				$('#idProofErrorOnEnroll').hide();
+				self.ifscTransaction("");
+				
+				self.senderAadhaar("");
+				focusBox1();				
+			};
+			
+			self.resetTransaction = function resetTransaction(){
+				self.recipients([]);  
+				self.senderName("");
+				self.showRecipientForm(false);//this is func can be :change it to computed observable
+				self.showSenderForm(false);
+				self.newRecipient(null);
+				self.selectedRecipient(null);
+				self.amount(null);
+				
+				self.clearMessage();
+				self.focusAmount(false);
+				
+				self.showSenderUsage(false);
+				$('#transaction_mode_select').val('0');
+				$("#sender_name").attr("readonly", false);
+				$("#sender_aadhaar_update").attr("readonly", false);
+				self.ifscTransaction("");
+				
+				focusBox1();
+			};
+
+			
+			self.clearMessage = function clearMessage(){
+				$("#trxn_response").html("");
+				$("#trxn_response").hide("slow");
+			};
+			
+						
+			self.senderCell.subscribe(function(newValue) {self.resetTransaction();});
+			
+			
+			
+			self.resetIfscTransactionError = function resetIfscTransactionError() {
+				self.ifscTransactionError(false);
+				return true;
+			};
+			
+			resetIfscOptionalFlag = function resetIfscOptionalFlag() {
+				self.newRecipient().recipientIfscOptional(false);
+				return true;
+			};
+			
+			self.resetRegistrationClick = function resetRegistrationClick() {
+				self.newRecipient().registerRecipientClicked(false);
+				return true;
+			};
+			
+			self.resetRecipientAccountNumError = function resetRecipientAccountNumError() {
+				self.newRecipient().recipientAccountNumError(false);
+				self.newRecipient().recipientFound(false);
+				self.resetRegistrationClick();
+				//$("#rcpnt_ifsc").attr("placeholder", "IFSC Code");
+				$("#rcpnt_name").attr("placeholder", "Recipient Name");
+				$("#div_rcpnt_foundtext").hide("slow");
+				$("#btn_recipientlist").hide();
+				//$("#btn_confirmaddrecipient").show();    //commented by rohit lakshykar to preventing add button visibility 
+				return true;
+			};
+			
+			self.resetSendMoneyClick = function resetSendMoneyClick() {
+				self.sendMoneyClicked(false);
+				// self.resetOkekeyError();
+				self.resetIfscTransactionError();
+				return true;
+			};
+			
+			self.resetEnrolClick = function resetEnrolClick() {
+				self.enrolClicked(false);
+				return true;
+			};
+			
+			self.recipientIndividualInquiry = function recipientIndividualInquiry() {
+				$('.loading').show();
+				Dajaxice.transaction.recipient_individual_inquiry_icici(self.recipientIndividualInquiryResponse, {
+					'senderNumber': self.senderCell(),
+					'recipientAccountOrCode': self.selectedRecipient().code
+				});	
+			};
+			
+			self.recipientIndividualInquiryResponse = function recipientIndividualInquiryResponse(data) {
+				self.addMessage(data);
+				
+				$('.loading').hide();
+			};
+			
+			self.highlightPicker = function highlightPicker() {
+				$("#recipient_bank_selection").css("border", "solid 1px gray");
+				$("#recipient_bank_selection").focusout(function () {				
+					$("#recipient_bank_selection").css("border", "");			
+				});
+			};
+			
+			self.highlightPickerMode = function highlightPickerMode() {
+				$("#transaction_mode_select").css("border", "solid 1px gray");
+				$("#transaction_mode_select").focusout(function () {				
+					$("#transaction_mode_select").css("border", "");			
+				});
+			};
+			
+			self.bindSelection = function bindSelection() {	 
+				$(".chosen-select").chosen();
+				if(self.accountLookup()) {	
+					
+			    	
+			    	$("#rcpnt_accnt_no").bind("focusout", function() {
+			    		if($("#rcpnt_accnt_no").val() != "" && $("#recipient_bank_selection").val() != "0") {
+				    		self.triggerRecipientAccountNumInquiry();
+						}
+			    	});
+		    	}	
+		    }	    
+		    
+		    self.triggerRecipientAccountNumInquiry = function triggerRecipientAccountNumInquiry() {
+		    	$(".loading").show();	    		
+				
+				$("#rcpnt_ifsc").val("");				
+				$("#rcpnt_name").val("");
+				Dajaxice.transaction.get_existing_recipient_info(self.existing_recipient_response, {
+					'bankId': $("#recipient_bank_selection").val(),
+					'accountNum': $("#rcpnt_accnt_no").val()
+				});
+		    }
+		    
+		    self.actionOnRecipientBankSelection = function actionOnRecipientBankSelection() {
+		    	self.resetRecipientAccountNumError();
+		    	//$("#rcpnt_name").attr("readonly", false);
+		    	self.newRecipient().name("");
+		    	self.newRecipient().account("");    	
+		    	self.newRecipient().ifsc("");
+				self.newRecipient().cellnumber("");
+		    	self.triggerRecipientBankInquiry();
+		    	if($("#recipient_bank_selection").val() != "0")
+		    		self.newRecipient().recipientBankSelected(true);
+		    	else
+		    		self.newRecipient().recipientBankSelected(false);		    			    	
+		    };
+      
+		    self.triggerRecipientBankInquiry = function triggerRecipientBankInquiry() {		    	    		
+				if($("#recipient_bank_selection").val() != "0") {
+					$("#btn_confirmaddrecipient").hide();
+	    			$("#btn_confirmaverifyrecipient").hide();
+					$(".loading").show();	
+					Dajaxice.transaction.bank_config_inquiry(self.bank_config_response, {
+						'bankId': $("#recipient_bank_selection").val()
+					});
+				}
+				else {
+					$("#rcpnt_ifsc").attr("placeholder", "IFSC Code");
+			    	self.newRecipient().recipientIfscOptional(false);
+				}
+				
+		    };
+		    
+		    self.bank_config_response = function bank_config_response(data) {
+		    	//added by rohit lakshykar start
+		    	if(data.status == "BANK_CONFIG_INQUIRY_SUCCESS") {
+		    		if(data.isverificationavailable == "1"){
+		    			$("#div_rcpnt_name").hide();
+		    			$("#div_rcpnt_number").hide();
+		    			$("#btn_confirmaddrecipient").hide();
+		    			$("#btn_confirmaverifyrecipient").show();
+		    		}else if(data.isverificationavailable == "0"){
+		    			$("#btn_confirmaverifyrecipient").hide();
+		    			$("#div_rcpnt_name").show();
+		    			$("#div_rcpnt_number").show();
+		    			$("#btn_confirmaddrecipient").show();
+		    		}
+		    	//edit end
+		    	
+		    		if(data.ifsc_status != 4) {
+			    	//$("#rcpnt_ifsc").attr("placeholder", "IFSC Code (Optional)");
+			    		self.newRecipient().recipientIfscOptional(true);
+			    	}
+			    	else
+			    	{
+			    			$("#rcpnt_ifsc").attr("placeholder", "IFSC Code");
+			    			self.newRecipient().recipientIfscOptional(false);
+			    	}
+		    		
+		    				    			    		
+		    	}
+		    	else {
+		    		//self.newRecipient().recipientIfscOptional(false);
+		    		self.addMessage(data);
+		    	}	
+		    	$(".loading").hide();
+		    };
+		    
+		    self.bankIFSCResponse = function bankIFSCResponse(data) {
+		    	if(data.ifsc != null)
+					$("#rcpnt_ifsc").val(data.ifsc);
+				$(".loading").hide();
+			};
+			
+			self.existing_recipient_response = function existing_recipient_response(data) {
+		    	if(data.status == "EXISTING_RECIPIENT_NOT_FOUND") {
+		    		self.newRecipient().recipientFound(false);
+					//$("#rcpnt_ifsc").focus();
+					self.newRecipient().ifsc("");
+					self.newRecipient().name("");
+					//$("#rcpnt_ifsc").attr("placeholder", "IFSC Code");
+					$("#rcpnt_name").attr("placeholder", "Recipient Name");
+					$("#div_rcpnt_foundtext").hide("slow");									
+				}
+				else {
+					self.newRecipient().recipientFound(true);					
+					$("#rcpnt_ifsc").attr("placeholder", data.ifsc);
+					$("#rcpnt_name").attr("placeholder", data.recipient);
+					$("#rcpnt_number").focus();
+					$("#div_rcpnt_foundtext").show("slow");
+				}
+				$(".loading").hide();
+			};
+			
+			self.configSetter = function configSetter() {
+				if("{{ perms.transaction.account_lookup_allowed }}" == "True")
+					self.accountLookup(true);
+				else
+					self.accountLookup(false);
+					
+				if("{{ perms.transaction.mandatory_recipient_bank_selection }}" == "True")
+					self.mandatoryRecipientBank(true);
+				else
+					self.mandatoryRecipientBank(false);
+			};
+			
+			
+		}
+		
+		function Recipient(name,account,code,ifsc,cellnumber,imps,neft,impsIfscRequiredFlag,neftIfscRequiredFlag,impsUnavailable) {
+			var self = this;
+			self.name = ko.observable(name).extend({ required: "Please enter recipient name" });
+			self.account = ko.observable(account).extend({ required: "Please enter recipient account number" });
+			self.ifsc = ko.observable(ifsc).extend({ required: "Please enter ifsc code" });
+			self.cellnumber = ko.observable(cellnumber).extend({ required: "Please enter ifsc code" });
+			self.code = ko.observable(code);
+			
+			self.registerRecipientClicked = ko.observable(false);
+			self.recipientAccountNumError = ko.observable(false);
+			self.recipientFound = ko.observable(false);		
+			
+			self.impsFlag = ko.observable(imps);
+			self.impsIfscRequiredFlag = ko.observable(impsIfscRequiredFlag);
+			self.neftFlag = ko.observable(neft);
+			self.neftIfscRequiredFlag = ko.observable(neftIfscRequiredFlag);
+			
+			self.impsUnavailableFlag = ko.observable(impsUnavailable);
+			
+			self.recipientIfscOptional = ko.observable(false);
+			self.recipientBankSelected = ko.observable(false);
+		}
+	
+		ko.extenders.required = function(target, overrideMessage) {
+			//add some sub-observables to our observable
+			target.isBlank = ko.observable();
+			target.validationMessage = ko.observable();
+ 
+			//define a function to perform validation
+			function validate(newValue) {
+				if(newValue){
+					target.isBlank(newValue == ''? true : false);	
+					target.validationMessage(newValue == '' ? "" : overrideMessage || "This field is required");				
+				} 
+				else {
+					target.isBlank(true);
+					target.validationMessage(overrideMessage || "This field is required");
+				}
+			}
+			
+			//initial validation
+			validate(target());
+ 
+			//validate whenever the value changes
+			target.subscribe(validate);
+ 
+			//return the original observable
+			return target;
+		};
+		
+		ko.extenders.fixedLength = function(target, len) {
+			//add some sub-observables to our observable
+			target.hasError = ko.observable();
+			 
+			//define a function to do validation
+			function validate(newValue) {
+				if(newValue){
+					target.hasError(newValue.length == len ? false : true);					
+				} 
+				else {
+					target.hasError(true);
+				}
+			}
+ 
+			//initial validation
+			validate(target());
+ 
+			//validate whenever the value changes
+			target.subscribe(validate);
+ 
+			//return the original observable
+			return target;
+		};
+		
+		ko.bindingHandlers.executeOnEnter = {
+			init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+				var allBindings = allBindingsAccessor();
+				$(element).keypress(function (event) {
+		            var keyCode = (event.which ? event.which : event.keyCode);
+		            if (keyCode === 13) {
+		            	var idx = $('tr.recipient').index(element);
+		            	
+							
+		                allBindings.executeOnEnter.call(viewModel);
+		                return false;
+					}
+					return true;
+				});
+			}
+		};
+				
+		ko.bindingHandlers.executeOnDownArrow = {
+			init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+				$(element).keydown(function (event) {
+		            var keyCode = (event.which ? event.which : event.keyCode);
+		            if (keyCode === 40) {
+						var $foo = $('tr.recipient');
+						var idx = $foo.index(element);						
+						var next = $foo.eq(idx + 1);
+						if($foo.index(next) == -1)
+							next = $foo.eq(0);
+						next.click();
+						next.focus();
+						return false;
+					}
+					return true;
+				});
+			}
+		};
+		
+		ko.bindingHandlers.executeOnUpArrow = {
+			init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+				$(element).keydown(function (event) {
+		            var keyCode = (event.which ? event.which : event.keyCode);
+		            if (keyCode === 38) {
+						var $foo = $('tr.recipient');
+						var idx = $foo.index(element);
+						var next = $foo.eq(idx - 1);
+						next.click();
+						next.focus();				
+		                return false;
+					}
+					return true;
+				});
+			}
+		};
+		
+		var viewModel = new TransactionViewModel();
+		ko.applyBindings(viewModel);
+		viewModel.configSetter();
+		focusBox1();
+				
+		function isNumber(evt) {
+	        var charCode = (evt.which) ? evt.which : event.keyCode;
+	        if (charCode > 31 && (charCode < 48 || charCode > 57))
+	           return false;
+	        return true;
+	    }
+	</script>
+	
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart(used, left) {
+        var data = google.visualization.arrayToDataTable([
+          ['Type', 'Value'],
+          ['Sender Limit Used', used],
+          ['Sender Limit Left', left]
+        ]);        
+        
+        var options = {
+          
+          pieHole: 0.4,
+          colors:['#e74c3c','#f1c40f'],
+          legend: 'none',
+          backgroundColor: 'transparent',         
+          tooltip: {text: 'value'},
+          pieSliceText: 'none',
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+        chart.draw(data, options);
+      }
+      
+      function prepareAndDisplayChart(remaining, total) {
+      	drawChart(parseInt(total, 10) - parseInt(remaining, 10), parseInt(remaining, 10));
+      }     
+    </script>
+    
+    <!-- <script type='text/javascript' src="{% static 'js/jquery.min.js' %}"></script> -->
+    <script type='text/javascript' src="{% static 'js/jquery-asProgress.js' %}"></script>
+    <script type="text/javascript">
+    jQuery(document).ready(function($){
+        $('.progress').asProgress({
+            'namespace': 'progress'
+        });
+		$('.progress').asProgress('start');
+    });
+    </script>
+    
+	{{ block.super }}
+{% endblock my_script %}

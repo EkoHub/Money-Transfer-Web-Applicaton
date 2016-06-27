@@ -1,0 +1,18 @@
+<!--copyright @ Eko India Financial Service Pvt. Ltd.-->
+{% extends "welcome_base.html" %}
+
+{% block content %}
+
+    {% if form.errors %}
+        <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    <p>This is connect home.<br/>
+	We write here the public content.
+	</p>
+	<h1>Prepare for the glory</h1>
+	<div class="medium primary btn"> 
+		<a href={% url 'user-login' %} > LOGIN </a> 
+	</div>
+	
+{% endblock %}

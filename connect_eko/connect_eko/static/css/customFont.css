@@ -1,0 +1,17 @@
+/*copyright @ Eko India Financial Service Pvt. Ltd.*/
+
+@CHARSET "UTF-8";
+
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Lato Regular'), local('Lato-Regular'), url(http://themes.googleusercontent.com/static/fonts/lato/v7/9k-RPmcnxYEPm8CNFsH2gg.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'Canter Light';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Canter Light'), local('Canter Light'), url('/home/harshita/Documents/Products/connect_eko/commission/static/fonts/CanterLight.otf') format('otf');
+}

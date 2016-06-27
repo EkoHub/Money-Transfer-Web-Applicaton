@@ -1,0 +1,27 @@
+<!--copyright @ Eko India Financial Service Pvt. Ltd.-->
+{% load staticfiles %}
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <title>The page you were looking for doesn't exist (404)</title>
+  <style type="text/css">
+     body { background-color: #efefef; color: #333; font-family: Georgia,Palatino,'Book Antiqua',serif;padding:0;margin:0;text-align:center; }
+    p {font-style:italic;}
+    div.dialog {
+      width: 720px;
+      margin: 7em auto 0 auto;
+      font-size: 26px;
+    }
+    img { border:none; }
+  </style>
+</head>
+
+<body>
+  <!-- This file lives in public/404.html -->
+  <div class="dialog">
+	<h1>Error 404</h1>
+    <p>It looks like that page you were looking has been mislaid, sorry.</p>
+    <h3><a href="{% url 'user:user-login' %}">Take me home</a></h3>
+  </div>
+</body>
+
+
