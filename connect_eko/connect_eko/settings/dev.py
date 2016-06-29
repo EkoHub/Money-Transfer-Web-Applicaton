@@ -6,7 +6,7 @@ DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'connect_eko',                      # Or path to database file if using sqlite3./home/pradeep/projects/python/connect_eko/connect_eko/sqlite3.db
+        'NAME': 'connect_eko_demo',                      # Or path to database file if using sqlite3./home/pradeep/projects/python/connect_eko/connect_eko/sqlite3.db
         # The following settings are not used with sqlite3:
         'USER': 'root',
         'PASSWORD': 'root',

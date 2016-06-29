@@ -1,5 +1,6 @@
-#copyright @ Eko India Financial Service Pvt. Ltd.
 #!/usr/bin/env python
+#copyright @ Eko India Financial Service Pvt. Ltd.
+
 import os
 import sys
 
