@@ -64,7 +64,7 @@ $python manage.py runserver
 
     	f. Open the browser & type 
 
-localhost:<port_no>/admin
+localhost:8000/admin
 
        	Now populate the databases & change accordingly.
 
