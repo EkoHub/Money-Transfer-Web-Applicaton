@@ -62,7 +62,7 @@ mysql> exit;
 
 $python manage.py runserver     
 
-    h. Open the browser & type 
+    	f. Open the browser & type 
 
 localhost:<port_no>/admin
 
